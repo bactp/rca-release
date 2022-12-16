@@ -4,3 +4,5 @@ numpy==1.23.5
 shap==0.41.0
 matplotlib==3.6.2
 requests
+pymongo==4.3.3
+joblib==1.2.0
