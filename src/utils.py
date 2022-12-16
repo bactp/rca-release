@@ -8,6 +8,9 @@ import numpy as np
 import src.interpretability_module as interp
 import pymongo
 import requests
+import time
+import sys
+import pandas as pd
 
 
 FEATURE_IDX = {0: 'catalogue_cpu_cfs_periods_total', 1: 'catalogue_cpu_cfs_throttled', 2: 'catalogue_cpu_usage', 3: 'catalogue_mem_usage', 4: 'catalogue_net_rx_byte',
@@ -69,6 +72,7 @@ def get_instances_list():
     except:
         instance_list.append(0)
    
+    
     print(instance_list)
     return instance_list
 
@@ -112,8 +116,9 @@ def merge_data(instance_list):
     construct features of dataset
     """
     data = {}
+    print(instance_list)
     for instance in instance_list:
-
+        print(instance)
         instance_metrics = get_instance_metrics(instance)
 
         data.update({
