@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: rca-server
+spec:
+  containers:
+  - name: rca-server
+    image: phuongbac/rca-server:latest
+    ports:
+            - containerPort: 80
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "500m"
+
