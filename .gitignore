@@ -1,2 +1,4 @@
 __pycache__/
 /rcaenv
+*.whl
+*/venv/*
