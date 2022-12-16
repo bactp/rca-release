@@ -9,6 +9,7 @@ import src.interpretability_module as interp
 import pymongo
 import requests
 import time
+import sys
 import pandas as pd
 
 
@@ -71,7 +72,8 @@ def get_instances_list():
     except:
         instance_list.append(0)
    
-    print(instance_list)
+    print(instance_list, file=sys.stdout)
+    print(instance_list, flush=True)
     return instance_list
 
 
