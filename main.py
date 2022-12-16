@@ -5,7 +5,7 @@ sys.path.append(os.path.abspath('src'))
 from src.utils import *
 from src.training import *
 from src.serving import *
-from flask import Flask, request, jsonify
+# from flask import Flask, request, jsonify
 from http import HTTPStatus
 import pickle
 
@@ -65,28 +65,37 @@ if __name__ == "__main__":
     # training(data_path=data_path, params=params, saved_path=saved_path, model_name=model_name)
     
     #===serving===
-    loaded_model = load_model(fp=f'model/model5.sav')
-    # print("==========MODEL LOADED==========")
-    instance_list = get_instances_list()
-    data_collection_name = "training_data"
+    # loaded_model = load_model(fp='model/model5.sav')
+    # # print("==========MODEL LOADED==========")
+    # # instance_list = get_instances_list()
+    # data_collection_name = "training_data"
     
-    while True:
-        sp_data = merge_data(instance_list)
-        collect_training_data(sp_data, data_collection_name)
-        data_df = pd.DataFrame([sp_data])
-        data_df = data_df.reindex(columns=sorted(data_df.columns))
-        #save to db
+    # print(loaded_model)
+    # data_df = pd.read_csv('model/training_data.csv')
+    # feature = data_df.loc[:, ~data_df.columns.isin(['timestamp', 'label'])].copy()
+    # feature = tp_preprocess_data(df=feature)
+    # print(feature.head())
+    # serving(model=loaded_model, feature=feature)
+    # while True:
+    #     sp_data = merge_data(instance_list)
+    #     collect_training_data(sp_data, data_collection_name)
+    #     data_df = pd.DataFrame([sp_data])
+    #     data_df = data_df.reindex(columns=sorted(data_df.columns))
+    #     #save to db
 
-        #serving
-        feature = data_df.loc[:, data_df.columns != 'timestamp'].copy()
-        feature = tp_preprocess_data(df=feature)
+    #     #serving
+    #     feature = data_df.loc[:, data_df.columns != 'timestamp'].copy()
+    #     feature = tp_preprocess_data(df=feature)
 
-        serving(model=loaded_model, feature=feature)
+    #     serving(model=loaded_model, feature=feature)
 
-        time.sleep(5)
+    #     time.sleep(5)
  
 
-    
-
-
+    # test slicing window
+    while True:
+        d = {'time': time.strftime('%X %x %Z'), 'a': 1, 'b': 32}
+        df = slice_df(input=d, df_name='series_df')
+        # print(df)
+        time.sleep(5)
 

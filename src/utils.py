@@ -8,8 +8,6 @@ import numpy as np
 import src.interpretability_module as interp
 import pymongo
 import requests
-import time
-import pandas as pd
 
 
 FEATURE_IDX = {0: 'catalogue_cpu_cfs_periods_total', 1: 'catalogue_cpu_cfs_throttled', 2: 'catalogue_cpu_usage', 3: 'catalogue_mem_usage', 4: 'catalogue_net_rx_byte',
@@ -326,3 +324,30 @@ def compensation(ab_score: dict, topk: int):
         sorted_d = {k: v for k, v in sorted(ab_score.items(), key=lambda item: item[1], reverse=True)}
         topk_d = dict(list(sorted_d.items())[0: topk])
     return topk_d
+
+
+def slice_df(input: dict, df_name: str) -> pd.DataFrame:
+    if not os.path.isdir('./data'):
+        os.makedirs('./data')
+    
+    try:
+        df = pd.read_csv(f'./data/{df_name}.csv')
+        if df.shape[0] == 5:
+            tmp_df = pd.DataFrame([input])
+            df = pd.concat([df, tmp_df], ignore_index=True)
+            df = df.loc[1:]
+            df.to_csv(f'./data/{df_name}.csv', index=0)
+            return df
+        elif df.shape[0] < 5:
+            tmp_df = pd.DataFrame([input])
+            df = pd.concat([df, tmp_df], ignore_index=True)
+            df.to_csv(f'./data/{df_name}.csv', index=0)
+            return df
+        else:
+            raise ValueError("MORE THAN 5 EVENTS IN THE DATAFRAME !!!")
+    except:
+        df = pd.DataFrame([input])
+        df.to_csv(f'./data/{df_name}.csv', index=0)
+        return df
+
+
