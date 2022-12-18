@@ -47,17 +47,17 @@ def serving(model, feature: pd.DataFrame):
         t = top_map(model=model, k=100000, arr=arr)
         name_mapping = map_feature_name(t[0])
         # print(name_mapping)
-        print(dict(list(name_mapping.items())[0: 10]))
-        add_weight = compensation(ab_score=name_mapping, topk=5)
-        print(add_weight)
+        name_mapping = dict(list(name_mapping.items())[0: 5]) # take 5 
+        # add_weight = compensation(ab_score=name_mapping, topk=5)
+        # print(add_weight)
         print("==========SERVING FINISHED==========")
 
         rca_mess = {
             "time": time.strftime('%X %x %Z'),
             "status": "Incident",
-            "location": message(add_weight),
+            "location": message(name_mapping),
             "type": "net",
-            "potential_root_cause": add_weight
+            "potential_root_cause": name_mapping
         }
         rca_mess = json.dumps(rca_mess, indent=4)
         # print(json_response)

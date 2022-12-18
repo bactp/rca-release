@@ -14,3 +14,7 @@ Postman-POST: http://192.168.40.246:6868/model/training
 Config in the postman: Headers
 Key: Content-Type
 Value: application/json
+
+
+
+Copy the above dict to body -> raw (json)
