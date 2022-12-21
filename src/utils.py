@@ -40,8 +40,6 @@ def get_instances_list():
     except:
         pass
    
-    
-    print(instance_list)
     return instance_list
 
 
@@ -91,7 +89,10 @@ def get_instance_metrics(name):
                     test = round(float(response.json()['data']['result'][0]['value'][1]), 4)
                     metrics.append(test)
                     break
-                i = i + 1
+                if i == 2:
+                    metrics.append(0)
+            
+
         except:
             print("Exception")
 
@@ -134,7 +135,6 @@ def data_stream_instance(instance):
     """
     data = {}
     instance_metrics = get_instance_metrics(instance)
-
     data.update({
                 '_CPU_utilization': instance_metrics[0],
                 '_load_average': instance_metrics[1],
@@ -335,19 +335,6 @@ def top_map(model, k: int, arr: np.ndarray):
     return dict_list
 
 
-# def get_most_appeared_feature(imp_dict: [dict]) -> list:
-#     items = []
-#     temp = []
-#     for d in imp_dict:
-#         for k, _ in d.items():
-#             items.append(k)
-#     items_occ = dict((x, items.count(x)) for x in set(items))
-#     sorted_items_occ = {k: v for k, v in sorted(items_occ.items(), key=lambda item: item[1], reverse=True)}
-#
-#     for k, _ in sorted_items_occ.items():
-#         temp.append(k)
-#     return temp
-
 
 def map_feature_name(d: dict, feature_index: dict) -> dict:
     map_d = {}
@@ -369,25 +356,6 @@ def get_feature_index(df: pd.DataFrame) -> dict:
         return d
 
 
-# def compensation(ab_score: dict, topk: int):
-#     w_dict = {
-#         "compute": 0.86,
-#         "vm": 0.12,
-#         "host": 0.02
-#     }
-
-#     for k, v in ab_score.items():
-#         if "compute" in k:
-#             ab_score[k] = (ab_score[k] * w_dict["compute"]) / 2
-#         elif "vm" in k:
-#             ab_score[k] = (ab_score[k] * w_dict["vm"]) / 2
-#         else:
-#             ab_score[k] = (ab_score[k] * w_dict["host"]) / 2
-
-#         sorted_d = {k: v for k, v in sorted(ab_score.items(), key=lambda item: item[1], reverse=True)}
-#         topk_d = dict(list(sorted_d.items())[0: topk])
-#     return topk_d
-
 
 #=======detection and Action triggering=====#
 
@@ -397,21 +365,6 @@ def send_request(url: str, payload: dict):
     """
     response = requests.post(url, json = payload)
     return response
-
-def check_condition(incident):
-    """
-    check status of detected instance
-    """
-    condition = 'node_network_info{device=~"'+ incident + '"}'
-    try:
-        response = requests.get('http://192.168.40.232:31270/api/v1/query', params={'query': check_metrics})
-        if bool(response.json()['data']['result']):
-            test = round(float(response.json()['data']['result'][0]['value'][1]), 4)
-            detected_incident.append(incident)
-        else:
-            metrics.append(0)
-    except:
-        print("Exception")
 
 
 

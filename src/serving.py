@@ -33,29 +33,29 @@ def serving_by_instance(instance_list, model):
         data_df =  pd.DataFrame([data])
         data_df = data_df.reindex(columns=sorted(data_df.columns))
         feature = data_df.loc[:, ~data_df.columns.isin(['timestamp', 'label'])].copy()
-        feature = tp_preprocess_data(df=feature)
+        # feature = tp_preprocess_data(df=feature) 
 
         abnormal_points = predict(model=model, df=feature)
         if abnormal_points['abnormal_score'].item() == 1: # 1: normal, 0: abnormal
-            print("Anomalous Predicted !!!")
-            print(instance)
+            print(time.strftime('%X %x %Z') + ": Anomalous Predicted !!!")
             incident_list.append(instance)
             incident_df_list.append(feature)
     
     return incident_list, incident_df_list
 
-def prediction_mess(incident_list):
-    if len(incident_list)==0:
+def prediction_mess(incident_cluster):
+    if len(incident_cluster)==0:
         pass
     else:
         predict_mess = {
-                    "time": time.strftime('%X %x %Z'),
-                    "status": "Incident",
-                    "potential_objects": incident_list
-                }
-        request_body = json.dumps(predict_mess, indent=4)
-        print(request_body)
-        response = send_request("http://127.0.0.1:5000/manager/RCAs", request_body)
+                       "data": incident_cluster
+                       }
+        # request_body = json.dumps(predict_mess, indent=4)
+        print(time.strftime('%X %x %Z') + ": Warning signal")
+        try:
+            send_request("http://192.168.40.114:9999/rca/warning", predict_mess)
+        except:
+            pass
 
 
 
@@ -64,89 +64,22 @@ def serving_rca(model, data_df: pd.DataFrame, feature_idx: dict):
     Make detection real-time and root cause analysis
     """
     data_df = data_df.reindex(columns=sorted(data_df.columns))
-    print(data_df)
-    
     feature = data_df.loc[:, ~data_df.columns.isin(['timestamp', 'label', 'id'])].copy()
-    feature = tp_preprocess_data(df=feature)
 
     abnormal_points = predict(model=model, df=feature)
-    # if abnormal_points['abnormal_score'].item() == 1: # 1: normal, 0: abnormal
-    print("Incident !!!")
 
     add_label = visualize(predictions=abnormal_points, df=feature, cols=list(feature.columns))
 
-    add_label = add_label[add_label['abnormal_score'] == 1]
+    # add_label = add_label[add_label['abnormal_score'] == 0]
+    # add_label = add_label[add_label['abnormal_score'] == 1]
     arr = add_label.drop(['abnormal_score'], axis=1).to_numpy()
     t = top_map(model=model, k=100000, arr=arr)
     name_mapping = map_feature_name(d=t[0], feature_index=feature_idx)
     # print(name_mapping)
-    # name_mapping = dict(list(name_mapping.items())[0: 5]) # take 5 
-    # add_weight = compensation(ab_score=name_mapping, topk=5)
-    # print(add_weight)
-    # print("==========SERVING FINISHED==========")
 
-    rca_mess = {
-        "time": time.strftime('%X %x %Z'),
-        "status": "Incident",
-        # "objects": message(name_mapping),
-        # "kind": "net",
+    root_observed = {
+        "status": "Incident detected !!!",
         "potential_root_cause": name_mapping
     }
-    return rca_mess
-    # rca_mess = json.dumps(rca_mess, indent=4)
-    # print(json_response)
-    # response = send_request("http://127.0.0.1:5000/manager/RCAs", rca_mess)
-    # print(response)
-    # print(rca_mess)
-        
-    # else:
-    #     print(time.strftime('%X %x %Z') + ": Normal")
-
-
-
-
-"""
-def serving_rca(model, feature: pd.DataFrame):
-    data_df = pd.DataFrame([feature])
-    data_df = data_df.reindex(columns=sorted(data_df.columns))
-    print(data_df)
-    
-    feature = data_df.loc[:, ~data_df.columns.isin(['timestamp', 'label'])].copy()
-    feature = tp_preprocess_data(df=feature)
-
-    abnormal_points = predict(model=model, df=feature)
-    if abnormal_points['abnormal_score'].item() == 1: # 1: normal, 0: abnormal
-        print("Incident !!!")
-    
-        add_label = visualize(predictions=abnormal_points, df=feature, cols=list(feature.columns))
-
-        add_label = add_label[add_label['abnormal_score'] == 1]
-        arr = add_label.drop(['abnormal_score'], axis=1).to_numpy()
-        t = top_map(model=model, k=100000, arr=arr)
-        name_mapping = map_feature_name(t[0])
-        # print(name_mapping)
-        # name_mapping = dict(list(name_mapping.items())[0: 5]) # take 5 
-        # add_weight = compensation(ab_score=name_mapping, topk=5)
-        # print(add_weight)
-        # print("==========SERVING FINISHED==========")
-
-        rca_mess = {
-            "time": time.strftime('%X %x %Z'),
-            "status": "Incident",
-            "objects": message(name_mapping),
-            "kind": "net",
-            "potential_root_cause": name_mapping
-        }
-        rca_mess = json.dumps(rca_mess, indent=4)
-        # print(json_response)
-        # response = send_request("http://127.0.0.1:5000/manager/RCAs", rca_mess)
-        # print(response)
-        print(rca_mess)
-        
-    else:
-        print(time.strftime('%X %x %Z') + ": Normal")
-
-"""
-
-
+    return root_observed
 

@@ -2,6 +2,10 @@ from src.utils import *
 import json
 from flask import Flask, request, jsonify
 from http import HTTPStatus
+import numpy as np
+import pandas as pd
+from sklearn.ensemble import IsolationForest
+from sklearn.model_selection import GridSearchCV
 
 
 
@@ -22,6 +26,5 @@ def training(data: pd.DataFrame, params: dict, saved_path: str, model_name:str):
     iforest = create_model(params=params)
     trained_iforest = train_model(model=iforest, feature=feature)
     fp = save_model(model=trained_iforest, fp=saved_path, name=model_name)
+    
     return fp
-
-
