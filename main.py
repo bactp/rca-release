@@ -87,75 +87,92 @@ def listening_damage_instane():
 
 def run_flask_server():
        api.run(host='0.0.0.0', port=9999)
-
+    
 
 if __name__ == "__main__": 
 
-    t1 = threading.Thread(target=run_flask_server)
-    t1.start()
+    # t1 = threading.Thread(target=run_flask_server)
+    # t1.start()
     
     params = {'n_estimators': 300, 'max_samples': 1024,'max_features': 12, 'contamination': 0.035, 'random_state': 0, 'bootstrap': False}
     saved_path = 'model'
-    model_name = 'lastest'
-    train_data = load_data_from_db("training_data_by_feature_2")
+    model_name = 'test4'
+    # train_data = load_data_from_db("training_1101")
+    instance_list = ["abc-control-plane-8c8kr", "abc-control-plane-brgpt", "abc-control-plane-m6l8b", "abc-md-0-4plgp", "abc-md-0-btqhx", "abc-md-0-d5t8w" ]
+    # train_data = pd.read_csv('data/initial.csv')
+    #training by instance
+    # training(train_data, params=params, saved_path=saved_path, model_name=model_name)
+    
+    # data_df = pd.DataFrame(train_data)
+    # for instance in instance_list:
+    #     data = data_df.loc[data_df["label"]==instance]
+    #     training_by_vm(data, saved_path, model_name)
+
     # training(train_data, params=params, saved_path=saved_path, model_name=model_name)
     loaded_model = load_model(f'model/{model_name}.sav')
-    instance_list = get_instances_list()
     
-    new_list = []
-    for instance in instance_list:
-        if instance[0:9] != 'edge-test':
-            new_list.append(instance)
-    instance_list = new_list
-    
+    i = 1
     while True:
     #     #====serving-prediction===
-        time.sleep(20)
+        if i == 1 :
+            time.sleep(10)
+            print(time.strftime('%X %x %Z') + ": Normal")
+            i = 0
+            continue
+        else:
+            time.sleep(7)
         incident_list, incident_df_list = serving_by_instance(instance_list=instance_list, model=loaded_model)
         if len(incident_list)==0:
             print(time.strftime('%X %x %Z') + ": Normal")
-            time.sleep(10)
             continue
         else:
-            # print(incident_list)
+            print(incident_list)
             incident_cluster = incident_list[0]
-            if 'edge' in incident_cluster:
-               prediction_mess(incident_cluster[0:14])
-            else:
-                prediction_mess(incident_cluster[0:10])
+            print(incident_cluster)
+            prediction_mess(incident_cluster)
+            # print(incident_cluster[0:2])
+            # if incident_cluster.find("edge-sample-small-01") != -1:
+            #     prediction_mess(incident_cluster[0:20])
+            # elif incident_cluster.find("starlab-01") != -1:
+            #     prediction_mess(incident_cluster[0:10])
+            # elif incident_cluster.find("starlab-edge-4") != -1:
+            #     prediction_mess(incident_cluster[0:14])
+            # elif  incident_cluster.find("starlab-edge-small-01") != -1:
+            #     prediction_mess(incident_cluster[0:21])
+           
 
 
-    #     #====serving-rca====
-        incident_detected = ""
-        file2 = open("myfile.txt", "r") 
-        i = 0
-        while True and i < 36:
-            i = i + 1
-            time.sleep(10)
-            incident_detected = file2.read()
-            if incident_detected != "":
-                print("-------------------")
-                print(incident_detected)
-                file2.close()
-                break
+    # # #     #====serving-rca====
+        # incident_detected = ""
+        # file2 = open("myfile.txt", "r") 
+        # i = 0
+        # while True and i < 36:
+        #     i = i + 1
+        #     time.sleep(10)
+        #     incident_detected = file2.read()
+        #     if incident_detected != "":
+        #         print("-------------------")
+        #         print(incident_detected)
+        #         file2.close()
+        #         break
 
     
-        data = data_stream_instance(incident_detected)
-        data_df = pd.DataFrame([data])
-        data_df = data_df.loc[:, ~data_df.columns.isin(['timestamp', 'label', 'id'])]
-        FEATURE_IDX = get_feature_index(data_df)
-        root_observed = serving_rca(model=loaded_model, data_df=data_df, feature_idx=FEATURE_IDX)
-        root_observed = json.dumps(root_observed, indent = 4) 
-        print(root_observed)
-        time.sleep(120)
+        # data = data_stream_instance(incident_detected)
+        # data_df = pd.DataFrame([data])
+        # data_df = data_df.loc[:, ~data_df.columns.isin(['timestamp', 'label', 'id'])]
+        # FEATURE_IDX = get_feature_index(data_df)
+        # root_observed = serving_rca(model=loaded_model, data_df=data_df, feature_idx=FEATURE_IDX)
+        # root_observed = json.dumps(root_observed, indent = 4) 
+        # print(root_observed)
+        
 
 # #===collect training data===
-        # data_stream = data_stream_all(instance_list)
-        # data_save_all_in_one(data_stream, "all-in-one")
+        # label = "normal"
         # for instance in instance_list:
-        #     print(instance)
         #     data = data_stream_instance(instance)
-        #     save_data_to_db(data_collection_name='training_data_by_feature_2', data=data)
-# 
+        #     save_data_to_db(data_collection_name='training_1101', data=data)
+        # time.sleep(5)
+
+
 
         

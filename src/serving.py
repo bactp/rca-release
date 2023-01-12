@@ -44,9 +44,21 @@ def serving_by_instance(instance_list, model):
     return incident_list, incident_df_list
 
 def prediction_mess(incident_cluster):
-    if len(incident_cluster)==0:
-        pass
-    else:
+    # if len(incident_cluster)==0:
+    #     pass
+    # else:
+    #     predict_mess = {
+    #                    "data": incident_cluster
+    #                    }
+        # incident_cluster = "edge-sample-small-01"
+        incident_cluster = "abc"
+    #     # request_body = json.dumps(predict_mess, indent=4)
+    #     print(time.strftime('%X %x %Z') + ": Warning signal")
+    #     try:
+    #         send_request("http://192.168.40.114:9999/rca/warning", predict_mess)
+    #     except:
+    #         pass
+        
         predict_mess = {
                        "data": incident_cluster
                        }
@@ -55,7 +67,7 @@ def prediction_mess(incident_cluster):
         try:
             send_request("http://192.168.40.114:9999/rca/warning", predict_mess)
         except:
-            pass
+            print("Err")
 
 
 

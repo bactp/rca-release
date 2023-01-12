@@ -28,3 +28,14 @@ def training(data: pd.DataFrame, params: dict, saved_path: str, model_name:str):
     fp = save_model(model=trained_iforest, fp=saved_path, name=model_name)
     
     return fp
+
+def training_by_vm(data: pd.DataFrame, saved_path: str, model_name:str):
+    feature = data.loc[:, ~data.columns.isin(['timestamp', '_id', 'label'])].copy()
+    feature = tp_preprocess_data(df=feature)
+    feature = feature.reindex(columns=sorted(feature.columns))
+    # print(feature.shape)
+    feature = df_normalize(df=feature)
+    iforest = load_model(f'model/{model_name}.sav')
+    trained_iforest = train_model(model=iforest, feature=feature)
+    fp = save_model(model=trained_iforest, fp=saved_path, name=model_name)
+    return fp
